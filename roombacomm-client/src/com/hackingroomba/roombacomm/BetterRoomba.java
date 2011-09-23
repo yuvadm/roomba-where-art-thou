@@ -43,11 +43,27 @@ public class BetterRoomba implements SerialPortEventListener {
 	@Override
 	synchronized public void serialEvent(SerialPortEvent e) {
 		try {
-			System.out.println("Serial event: " + e.getEventType());
-			System.out.println("Data available: " + String.valueOf(input.available()));
+			System.out.print("Serial event " + e.getEventType() + ": ");
 			
-			while (isr.ready())
-				System.out.print(isr.read() + ", ");
+			if (isr.ready()) {
+				int c = isr.read();
+				if (c == 18) {
+					for (int i=0; i<6; i++) {
+						System.out.print(isr.read() + " ");
+					}
+				}
+				if (c == 19) {
+					System.out.print(c + " ");
+					int bytes = isr.read();
+					for (int i=0; i<bytes; i++) {
+						System.out.print(isr.read() + " ");
+					}
+					System.out.print("[" + isr.read() + "] ");
+				}
+			}
+			else
+				System.out.println("For some weird reason the buffer ain't ready.");
+			
 			System.out.println("--");
 		} catch (Exception ex) {
 			System.out.println("Exception: " + ex.getMessage());

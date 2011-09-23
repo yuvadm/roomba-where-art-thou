@@ -1,6 +1,8 @@
 package com.hackingroomba.roombacomm;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
@@ -23,6 +25,8 @@ public class BetterRoomba implements SerialPortEventListener {
 	private InputStream input;
 	private OutputStream output;
 	
+	private InputStreamReader isr;
+	
 	public static void main(String[] args) throws Exception {
 		System.out.println("Starting...");
 		BetterRoomba br = new BetterRoomba();
@@ -37,8 +41,17 @@ public class BetterRoomba implements SerialPortEventListener {
 	}
 	
 	@Override
-	public void serialEvent(SerialPortEvent e) {
-		// do smthng with e
+	synchronized public void serialEvent(SerialPortEvent e) {
+		try {
+			System.out.println("Serial event: " + e.getEventType());
+			System.out.println("Data available: " + String.valueOf(input.available()));
+			
+			while (isr.ready())
+				System.out.print(isr.read() + ", ");
+			System.out.println("--");
+		} catch (Exception ex) {
+			System.out.println("Exception: " + ex.getMessage());
+		}
 	}
 	
 	public void startup() throws Exception {
@@ -64,6 +77,11 @@ public class BetterRoomba implements SerialPortEventListener {
 	}
 	
 	private void send(byte[] arr) throws Exception {
+		System.out.print("Sending: ");
+		for (byte b : arr) {
+			System.out.print(String.valueOf(b) + " ");
+		}
+		System.out.println("");
 		output.write(arr);
 	}
 	
@@ -82,6 +100,8 @@ public class BetterRoomba implements SerialPortEventListener {
 	                    
 	                    input  = serialPort.getInputStream();
 	                    output = serialPort.getOutputStream();
+	                    
+	                    isr = new InputStreamReader(input);
 	                    
 	                    serialPort.setSerialPortParams(RATE, DATABITS, STOPBITS, PARITY);
 	                    serialPort.addEventListener(this);

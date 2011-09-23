@@ -34,6 +34,10 @@ public class BetterRoomba implements SerialPortEventListener {
 		br.startup();
 		br.send(new byte[] {(byte) 136, (byte) 8});
 		Thread.sleep(5000);
+		br.send(new byte[] {(byte) 148, (byte) 2, (byte) 19,(byte) 20});
+		Thread.sleep(5000);
+		
+		br.send(new byte[] {(byte) 150, (byte) 0});
 		br.send(new byte[] {(byte) 136, (byte) 255});
 		br.shutdown();
 		
@@ -63,7 +67,6 @@ public class BetterRoomba implements SerialPortEventListener {
 			}
 			else
 				System.out.println("For some weird reason the buffer ain't ready.");
-			
 			System.out.println("--");
 		} catch (Exception ex) {
 			System.out.println("Exception: " + ex.getMessage());
